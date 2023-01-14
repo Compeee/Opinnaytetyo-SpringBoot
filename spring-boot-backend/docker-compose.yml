@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  oppari-database:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: oppari
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+volumes:
+  pg_data:

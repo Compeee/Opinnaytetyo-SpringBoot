@@ -1,5 +1,6 @@
 package com.oppari.springbootbackend.post;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.oppari.springbootbackend.comment.Comment;
 import com.oppari.springbootbackend.user.User;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -20,24 +22,21 @@ import java.util.List;
 @Table(name = "posts")
 public class Post {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String post;
+    private String content;
 
-    private Instant posted_at;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private LocalDateTime posted_at;
+    @JsonIgnore
+    @ManyToOne
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "comment_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    public Post(String post, Instant posted_at){
-        post = this.post;
-        posted_at = this.posted_at;
+    public Post(String content){
+        this.content = content;
     }
 
 }

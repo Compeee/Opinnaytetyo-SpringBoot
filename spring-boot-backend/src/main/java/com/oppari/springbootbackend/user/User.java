@@ -1,5 +1,6 @@
 package com.oppari.springbootbackend.user;
 
+import com.oppari.springbootbackend.comment.Comment;
 import com.oppari.springbootbackend.post.Post;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,6 +29,12 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Post> posts;
+    public User(String name, String email, String pass, UserRole role) {
+        this.username = name;
+        this.email = email;
+        this.password = pass;
+        this.userRole = role;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

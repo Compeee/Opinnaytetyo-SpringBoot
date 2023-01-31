@@ -1,0 +1,47 @@
+package com.oppari.springbootbackend.user;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+public class UserController {
+    private final UserService userService;
+
+    @Operation(summary = "Get a list of all registered users")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping
+    public List<User> getUsers(){
+        return userService.getUsers();
+    }
+
+    @Operation(summary = "Get an user by id")
+    @PreAuthorize("#userId == principal.id OR hasAuthority('ADMIN')")
+    @GetMapping("/{userId}")
+    public Optional<User> getUserById(@PathVariable Long userId){
+        return userService.findUserById(userId);
+    }
+
+    @Operation(summary = "Delete an user")
+    @PreAuthorize("#userId == principal.id OR hasAuthority('ADMIN')")
+    @DeleteMapping(path = "/{userId}")
+    public void deleteUser(@PathVariable("userId") Long userId) {
+        userService.deleteUser(userId);
+    }
+
+    @Operation(summary = "Change password")
+    @PreAuthorize("#userId == principal.id")
+    @PatchMapping(path = "/{userId}")
+    public void changeUserPassword(@PathVariable("userId") Long userId, @RequestBody ChangePassRequest changePassRequest){
+        System.out.println(changePassRequest.getPassword());
+        userService.changePassword(userId, changePassRequest.getPassword());
+    }
+}

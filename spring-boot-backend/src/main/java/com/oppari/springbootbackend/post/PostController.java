@@ -18,31 +18,31 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    @Operation(summary = "Get a list of all the posts")
+    @Operation(summary = "Get a list of all the posts", description = "Requires you to be authenticated")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @GetMapping
     public List<Post> getPosts(){
         return postService.getAllPosts();
     }
-    @Operation(summary = "Create a new post")
+    @Operation(summary = "Create a new post", description = "Requires you to be authenticated")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER') AND #userId == principal.id")
     @PostMapping("/{userId}")
     public Post createPost(@RequestBody Post post, @PathVariable("userId") Long userId){
         return postService.createPost(post, userId);
     }
-    @Operation(summary = "Delete a post")
+    @Operation(summary = "Delete a post", description = "Users can only delete their own posts, admin can delete any")
     @PreAuthorize("#userId == principal.id OR hasAuthority('ADMIN')")
     @DeleteMapping("/{postId}")
     public void deletePost(@RequestParam Long userId, @PathVariable("postId") Long postId){
         postService.deletePost(postId);
     }
-    @Operation(summary = "Get all the posts by a chosen user")
+    @Operation(summary = "Get all the posts by a chosen user", description = "Users can find their own posts, admins can find any")
     @PreAuthorize("#userId == principal.id OR hasAuthority('ADMIN')")
     @GetMapping("/{userId}")
     public List<Post> getPostsByUserId(@PathVariable("userId") Long userId){
         return postService.getPostsByUser(userId);
     }
-    @Operation(summary = "Edit the contents of a post")
+    @Operation(summary = "Edit the contents of a post", description = "Users can edit their own posts, admins can edit any")
     @PreAuthorize("#editPostRequest.userId == principal.id OR hasAuthority('ADMIN')")
     @PatchMapping("/{postId}")
     public void editPost(@PathVariable("postId") Long postId, @RequestBody EditPostRequest editPostRequest){

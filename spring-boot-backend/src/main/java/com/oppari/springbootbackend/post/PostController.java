@@ -19,13 +19,12 @@ public class PostController {
 
     private final PostService postService;
     @Operation(summary = "Get a list of all the posts", description = "Requires you to be authenticated")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @GetMapping
     public List<Post> getPosts(){
         return postService.getAllPosts();
     }
     @Operation(summary = "Create a new post", description = "Requires you to be authenticated")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER') AND #userId == principal.id")
+    @PreAuthorize("#userId == principal.id")
     @PostMapping("/{userId}")
     public Post createPost(@RequestBody Post post, @PathVariable("userId") Long userId){
         return postService.createPost(post, userId);
@@ -38,7 +37,7 @@ public class PostController {
     }
     @Operation(summary = "Get all the posts by a chosen user", description = "Users can find their own posts, admins can find any")
     @PreAuthorize("#userId == principal.id OR hasAuthority('ADMIN')")
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/users")
     public List<Post> getPostsByUserId(@PathVariable("userId") Long userId){
         return postService.getPostsByUser(userId);
     }

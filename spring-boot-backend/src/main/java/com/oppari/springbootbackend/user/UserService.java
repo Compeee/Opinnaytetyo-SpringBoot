@@ -1,5 +1,6 @@
 package com.oppari.springbootbackend.user;
 
+import com.oppari.springbootbackend.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +22,7 @@ public class UserService {
     public Optional<User> findUserById(Long userId) {
         boolean exists = userRepository.existsById(userId);
         if (!exists) {
-            throw new IllegalStateException("User doesn't exist");
+            throw new UserNotFoundException("User not found with id: ", userId);
         }
         return userRepository.findById(userId);
     }
@@ -35,7 +36,7 @@ public class UserService {
     public void deleteUser(Long userId) {
         boolean exists = userRepository.existsById(userId);
         if (!exists) {
-            throw new IllegalStateException("User doesn't exist");
+            throw new UserNotFoundException("User not found with id: ", userId);
         }
         userRepository.deleteById(userId);
     }

@@ -1,5 +1,7 @@
 package com.oppari.springbootbackend.comment;
 
+import com.oppari.springbootbackend.exception.CommentNotFoundException;
+import com.oppari.springbootbackend.exception.PostNotFoundException;
 import com.oppari.springbootbackend.post.Post;
 import com.oppari.springbootbackend.post.PostRepository;
 import com.oppari.springbootbackend.user.User;
@@ -26,7 +28,7 @@ public class CommentService {
     }
     public Comment createComment(Comment comment, Long postId){
         comment.setPosted_at(LocalDateTime.now());
-        Post post = postRepository.findById(postId).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CommentNotFoundException("Comment not found with id: ", postId));
         comment.setPost(post);
         List<Comment> comments = List.of(comment);
         post.setComments(comments);
@@ -37,14 +39,14 @@ public class CommentService {
     }
     public void deleteComment(Long commentId){
         if(!commentRepository.existsById(commentId)){
-            throw new IllegalStateException("No comment with id" + commentId + "exists");
+            throw new CommentNotFoundException("Comment not found with id ", commentId);
         }
         commentRepository.deleteById(commentId);
     }
 
     public void editComment(Long commentId, String content) {
         if(!commentRepository.existsById(commentId)){
-            throw new IllegalStateException("No comment with id" + commentId + "exists");
+            throw new CommentNotFoundException("Comment not found with id: ", commentId);
         }
         Comment edited_comment = commentRepository.findById(commentId).orElseThrow();
         edited_comment.setContent(content);

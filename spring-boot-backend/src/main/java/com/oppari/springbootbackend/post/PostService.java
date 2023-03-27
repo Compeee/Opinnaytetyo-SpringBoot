@@ -1,5 +1,7 @@
 package com.oppari.springbootbackend.post;
 
+import com.oppari.springbootbackend.exception.PostNotFoundException;
+import com.oppari.springbootbackend.exception.UserNotFoundException;
 import com.oppari.springbootbackend.user.User;
 import com.oppari.springbootbackend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class PostService {
     }
     public Post createPost(Post post, Long userId){
         post.setPosted_at(LocalDateTime.now());
-        User creatorOfPost = userRepository.findById(userId).orElseThrow();
+        User creatorOfPost = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with id: ", userId));
         post.setUser(creatorOfPost);
         List<Post> posts = creatorOfPost.getPosts();
         posts.add(post);
@@ -36,16 +38,13 @@ public class PostService {
     }
     public void deletePost(Long postId) {
         if(!postRepository.existsById(postId)){
-            throw new IllegalStateException("No post with id" + postId + "exists");
+            throw new PostNotFoundException("No post found with id: ",postId);
         }
         postRepository.deleteById(postId);
     }
 
     public void editPost(Long postId, String content) {
-        if(!postRepository.existsById(postId)){
-            throw new IllegalStateException("No post with id" + postId + "exists");
-        }
-        Post edited_post = postRepository.findById(postId).orElseThrow();
+        Post edited_post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post not found with id: ", postId));
         edited_post.setContent(content);
         postRepository.save(edited_post);
     }

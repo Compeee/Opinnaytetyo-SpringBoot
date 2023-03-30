@@ -6,9 +6,9 @@ import lombok.*;
 @EqualsAndHashCode
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 public class ChangePassRequest {
     private final Long userId;
     private final String password;
+
 }

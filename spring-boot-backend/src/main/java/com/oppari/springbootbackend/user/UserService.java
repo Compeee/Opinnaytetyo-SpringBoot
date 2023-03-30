@@ -1,8 +1,9 @@
 package com.oppari.springbootbackend.user;
 
+import com.oppari.springbootbackend.exception.InvalidPasswordException;
 import com.oppari.springbootbackend.exception.UserNotFoundException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final Validator validator;
     public List<User> getUsers(){
         return userRepository.findAll();
     }
@@ -28,7 +31,9 @@ public class UserService {
     }
 
     public void changePassword(Long userId, String password) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User not found with id: ", userId)
+        );
         user.setPassword(bCryptPasswordEncoder.encode(password));
         userRepository.save(user);
     }

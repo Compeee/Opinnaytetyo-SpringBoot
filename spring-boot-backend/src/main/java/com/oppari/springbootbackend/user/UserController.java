@@ -1,9 +1,15 @@
 package com.oppari.springbootbackend.user;
 
+import com.oppari.springbootbackend.exception.InvalidPasswordException;
+import com.sun.tools.jconsole.JConsoleContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +19,7 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -41,7 +48,9 @@ public class UserController {
     @PreAuthorize("#userId == principal.id")
     @PatchMapping(path = "/{userId}")
     public void changeUserPassword(@PathVariable("userId") Long userId, @RequestBody ChangePassRequest changePassRequest){
-        System.out.println(changePassRequest.getPassword());
+        if (changePassRequest.getPassword() == null || changePassRequest.getPassword().length() < 6) {
+            throw new InvalidPasswordException("Password must not be empty and must be at least 6 characters long");
+        }
         userService.changePassword(userId, changePassRequest.getPassword());
     }
 }

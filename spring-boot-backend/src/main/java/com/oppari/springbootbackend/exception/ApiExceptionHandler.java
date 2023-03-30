@@ -58,5 +58,11 @@ public class ApiExceptionHandler {
     public String InvalidPasswordHandler(InvalidPasswordException ex){
         return ex.getMessage();
     }
+    @ResponseBody
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String InvalidCredentialsHandler(InvalidCredentialsException ex){
+        return ex.getMessage();
+    }
 
 }

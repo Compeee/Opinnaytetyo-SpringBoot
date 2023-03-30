@@ -2,16 +2,17 @@ package com.oppari.springbootbackend.authentication;
 
 import com.oppari.springbootbackend.config.JwtService;
 import com.oppari.springbootbackend.exception.EmailAlreadyInUseException;
+import com.oppari.springbootbackend.exception.InvalidCredentialsException;
 import com.oppari.springbootbackend.exception.ValidationException;
 import com.oppari.springbootbackend.user.User;
 import com.oppari.springbootbackend.user.UserRepository;
 import com.oppari.springbootbackend.user.UserRole;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,9 +50,13 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(AuthRequest authRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+            );
+        } catch (AuthenticationException e) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
         var user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow();
         return AuthenticationResponse.builder()
                 .token(jwtService.generateToken(user))
